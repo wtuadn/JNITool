@@ -82,7 +82,7 @@ Java_com_wtuadn_jnitool_JNITool_jnidecrypt(JNIEnv *env, jclass type, jobject con
 
     const char *str = env->GetStringUTFChars(out_str, 0);
     char *result = AES_ECB_PKCS7_Decrypt(str, AES_KEY);//AES ECB PKCS7Padding解密
-//    char *result = AES_CBC_PKCS7_Decrypt(str, AES_KEY);//AES CBC PKCS7Padding解密
+//    char *result = AES_CBC_PKCS7_Decrypt(str, AES_KEY, AES_IV);//AES CBC PKCS7Padding解密
     env->ReleaseStringUTFChars(out_str, str);
 
     jsize len = (jsize) strlen(result);
