@@ -1,13 +1,11 @@
 # JNITool
-NDK实现的工具库，支持AES的ECB和CBC加解密，MD5加盐
+NDK实现的工具库，支持AES的ECB和CBC加解密（支持emoji），MD5加盐
 
 AES基于[tiny-AES128-C](https://github.com/kokke/tiny-AES128-C)扩展，根据key长度自动选择AES128、AES192、AES256
 
 默认采用PKCS7Padding填充（和PKCS5Padding一样），加密后进行一次Base64
 
 应用包名和签名的hash code放在native层，使用前会进行签名检验，防二次打包
-
-支持emoji加解密
 
 JNITool.java :
 ```java
