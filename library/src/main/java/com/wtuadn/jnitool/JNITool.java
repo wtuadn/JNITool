@@ -14,20 +14,18 @@ public class JNITool {
         System.loadLibrary("jni_tool");
     }
 
-    public static native boolean checkSignature(Context context);
+    private static native String jniencrypt(byte[] bytes);
 
-    private static native String jniencrypt(Context context, byte[] bytes);
+    private static native byte[] jnidecrypt(String str);
 
-    private static native byte[] jnidecrypt(Context context, String str);
+    public static native String pwdMD5(String str);
 
-    public static native String pwdMD5(Context context, String str);
-
-    public static String encrypt(Context context, String str) {
-        return jniencrypt(context, str.getBytes());
+    public static String encrypt(String str) {
+        return jniencrypt(str.getBytes());
     }
 
-    public static String decrypt(Context context, String str) {
-        return new String(jnidecrypt(context, str));
+    public static String decrypt(String str) {
+        return new String(jnidecrypt(str));
     }
 
     //获取签名

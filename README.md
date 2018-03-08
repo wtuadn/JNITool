@@ -7,12 +7,13 @@ AES基于[tiny-AES128-C](https://github.com/kokke/tiny-AES128-C)扩展，根据k
 
 应用包名和签名的hash code放在native层，使用前会进行签名检验，防二次打包
 
+支持emoji加解密
+
 JNITool.java :
 ```java
-    public static native boolean checkSignature(Context context);
-    public static native String pwdMD5(Context context, String str);
-    public static String encrypt(Context context, String str);
-    public static String decrypt(Context context, String str);
+    public static native String pwdMD5(String str);
+    public static String encrypt(String str);
+    public static String decrypt(String str);
 ```
 
 aes.c :

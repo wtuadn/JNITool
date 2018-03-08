@@ -15,16 +15,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.e(TAG, "signature："+JNITool.getSignature(this));
+        Log.e(TAG, "signature：" + JNITool.getSignature(this));
 
         String originalStr = "123";
-        String encrypt = JNITool.encrypt(this, originalStr);
+        String encrypt = JNITool.encrypt(originalStr);
         Log.e(TAG, "原字符串：" + originalStr);
         Log.e(TAG, "AES ECB PKCS7Padding 加密：" + encrypt);
-        Log.e(TAG, "AES ECB PKCS7Padding 解密：" + JNITool.decrypt(this, encrypt));
+        Log.e(TAG, "AES ECB PKCS7Padding 解密：" + JNITool.decrypt(encrypt));
 
         String pwdStr = "pwd123456";
         Log.e(TAG, "password: " + pwdStr);
-        Log.e(TAG, "md5再加salt: " + JNITool.pwdMD5(this, pwdStr));
+        Log.e(TAG, "md5再加salt: " + JNITool.pwdMD5(pwdStr));
     }
 }

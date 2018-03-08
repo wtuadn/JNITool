@@ -2,18 +2,29 @@
 #include <string>
 #include "aes.h"
 #include "md5.h"
+//#include <android/log.h>
 
 static const char *app_packageName = "com.wtuadn.demo";
-static const int app_signature_hash_code = -827662039;
+static const int app_signature_hash_code = 1967296062;
 static const uint8_t AES_KEY[] = "xS544RXNm0P4JVLHIEsTqJNzDbZhiLjr";
 static const uint8_t AES_IV[] = "KXTUDEdBs9zGlvy7";
 static const string PWD_MD5_KEY = "4J9lKuR2c8OuDPBAniEy5USFQdSM0An4";
 
-static bool signature_checked = false;
+static jobject getApplication(JNIEnv *env) {
+    jobject application = NULL;
+    jclass activity_thread_clz = env->FindClass("android/app/ActivityThread");
+    if (activity_thread_clz != NULL) {
+        jmethodID currentApplication = env->GetStaticMethodID(
+                activity_thread_clz, "currentApplication", "()Landroid/app/Application;");
+        if (currentApplication != NULL) {
+            application = env->CallStaticObjectMethod(activity_thread_clz, currentApplication);
+        }
+    }
+    return application;
+}
 
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_wtuadn_jnitool_JNITool_checkSignature(JNIEnv *env, jclass type, jobject context) {
+static bool checkSignature(JNIEnv *env) {
+    jobject context = getApplication(env);
     //Context的类
     jclass context_clazz = env->GetObjectClass(context);
     // 得到 getPackageManager 方法的 ID
@@ -51,15 +62,23 @@ Java_com_wtuadn_jnitool_JNITool_checkSignature(JNIEnv *env, jclass type, jobject
     if (hashCode != app_signature_hash_code) {
         exit(-2);
     }
-    signature_checked = true;
-    return JNI_TRUE;
+    return true;
+}
+
+jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+    JNIEnv *env = NULL;
+    if (vm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
+        return JNI_ERR;
+    }
+    if (checkSignature(env)) {
+        return JNI_VERSION_1_6;
+    }
+    return JNI_ERR;
 }
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_wtuadn_jnitool_JNITool_jniencrypt(JNIEnv *env, jclass type, jobject context, jbyteArray jbArr) {
-
-    if (!signature_checked) Java_com_wtuadn_jnitool_JNITool_checkSignature(env, type, context);
+Java_com_wtuadn_jnitool_JNITool_jniencrypt(JNIEnv *env, jclass type, jbyteArray jbArr) {
 
     char *str = NULL;
     jsize alen = env->GetArrayLength(jbArr);
@@ -76,9 +95,7 @@ Java_com_wtuadn_jnitool_JNITool_jniencrypt(JNIEnv *env, jclass type, jobject con
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_wtuadn_jnitool_JNITool_jnidecrypt(JNIEnv *env, jclass type, jobject context, jstring out_str) {
-
-    if (!signature_checked) Java_com_wtuadn_jnitool_JNITool_checkSignature(env, type, context);
+Java_com_wtuadn_jnitool_JNITool_jnidecrypt(JNIEnv *env, jclass type, jstring out_str) {
 
     const char *str = env->GetStringUTFChars(out_str, 0);
     char *result = AES_ECB_PKCS7_Decrypt(str, AES_KEY);//AES ECB PKCS7Padding解密
@@ -93,9 +110,7 @@ Java_com_wtuadn_jnitool_JNITool_jnidecrypt(JNIEnv *env, jclass type, jobject con
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_wtuadn_jnitool_JNITool_pwdMD5(JNIEnv *env, jclass type, jobject context, jstring out_str) {
-
-    if (!signature_checked) Java_com_wtuadn_jnitool_JNITool_checkSignature(env, type, context);
+Java_com_wtuadn_jnitool_JNITool_pwdMD5(JNIEnv *env, jclass type, jstring out_str) {
 
     const char *str = env->GetStringUTFChars(out_str, 0);
     string result = MD5(MD5(PWD_MD5_KEY + string(str)).toStr()).toStr();//加盐后进行两次md5
